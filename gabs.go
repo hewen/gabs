@@ -31,6 +31,8 @@ import (
 	"io/ioutil"
 	"strconv"
 	"strings"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 //------------------------------------------------------------------------------
@@ -781,7 +783,8 @@ func (g *Container) flatten(includeEmpty bool) (map[string]interface{}, error) {
 
 // Bytes marshals an element to a JSON []byte blob.
 func (g *Container) Bytes() []byte {
-	if bytes, err := json.Marshal(g.Data()); err == nil {
+	var j = jsoniter.ConfigCompatibleWithStandardLibrary
+	if bytes, err := j.Marshal(g.Data()); err == nil {
 		return bytes
 	}
 	return []byte("null")
@@ -861,7 +864,8 @@ func Wrap(root interface{}) *Container {
 func ParseJSON(sample []byte) (*Container, error) {
 	var gabs Container
 
-	if err := json.Unmarshal(sample, &gabs.object); err != nil {
+	var j = jsoniter.ConfigCompatibleWithStandardLibrary
+	if err := j.Unmarshal(sample, &gabs.object); err != nil {
 		return nil, err
 	}
 
@@ -912,7 +916,8 @@ func ParseJSONBuffer(buffer io.Reader) (*Container, error) {
 // structs which contain Container instances to be marshaled using
 // json.Marshal().
 func (g *Container) MarshalJSON() ([]byte, error) {
-	return json.Marshal(g.Data())
+	var j = jsoniter.ConfigCompatibleWithStandardLibrary
+	return j.Marshal(g.Data())
 }
 
 //------------------------------------------------------------------------------
